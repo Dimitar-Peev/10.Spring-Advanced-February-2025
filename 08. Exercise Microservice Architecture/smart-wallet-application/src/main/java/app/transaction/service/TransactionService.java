@@ -74,26 +74,6 @@ public class TransactionService {
                 .limit(4)
                 .collect(Collectors.toList());
 
-//        List<Transaction> allTransactions = transactionRepository.findAllBySenderOrReceiverOrderByCreatedOnDesc(
-//                wallet.getId().toString(), wallet.getId().toString());
-//
-//        List<Transaction> lastFourTransactions = new ArrayList<>();
-//        int count = 0;
-//
-//        for (Transaction t : allTransactions) {
-//            UUID id1 = t.getOwner().getId();
-//            UUID id2 = wallet.getOwner().getId();
-//            boolean b = t.getOwner().getId() == wallet.getOwner().getId();
-//
-//            if (t.getOwner().getId().equals(wallet.getOwner().getId()) && t.getStatus() == TransactionStatus.SUCCEEDED) {
-//                lastFourTransactions.add(t);
-//                count++;
-//                if (count == 4) {
-//                    break;
-//                }
-//            }
-//        }
-
         return lastFourTransactions;
     }
 }
