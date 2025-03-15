@@ -11,10 +11,6 @@
 <ol>
 	<li> Introduction </li>
 	<li> Monolithic Architecture </li>
-	- Migration Strategies
-	  - Strangler Pattern
-	  - Parallel Runs
-	  - Big Bang
 	<li> Communication Between Microservices </li>
 	<li> Feign Client </li>
 	<li> Database Strategies </li>
