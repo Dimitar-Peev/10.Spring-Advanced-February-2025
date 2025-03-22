@@ -17,6 +17,9 @@ import app.web.dto.RegisterRequest;
 import app.web.dto.UserEditRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -209,14 +213,42 @@ public class UserServiceUTest {
         verify(notificationService, times(1)).saveNotificationPreference(user.getId(), false, null);
     }
 
+    // Switch status method
+    @Test
+    void givenUserWithStatusActive_whenSwitchStatus_thenUserStatusBecomeInactive() {
 
+        // Given
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .isActive(true)
+                .build();
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
+        // When
+        userService.switchStatus(user.getId());
 
+        // Then
+        assertFalse(user.isActive());
+        verify(userRepository, times(1)).save(user);
+    }
 
+    @Test
+    void givenUserWithStatusInactive_whenSwitchStatus_thenUserStatusBecomeActive() {
 
+        // Given
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .isActive(false)
+                .build();
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
+        // When
+        userService.switchStatus(user.getId());
 
-
+        // Then
+        assertTrue(user.isActive());
+        verify(userRepository, times(1)).save(user);
+    }
 
     @Test
     void givenExistingUsersInDatabase_whenGetAllUsers_thenReturnThemAll() {
@@ -278,5 +310,31 @@ public class UserServiceUTest {
 
         // Then
         assertThat(user.getRole()).isEqualTo(UserRole.ADMIN);
+    }
+
+    @ParameterizedTest
+    @MethodSource("userRolesArguments")
+    void whenChangeUserRole_theCorrectRoleIsAssigned(UserRole currentUserRole, UserRole expectedUserRole) {
+
+        // Given
+        UUID userId = UUID.randomUUID();
+        User user = User.builder()
+                .role(currentUserRole)
+                .build();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // When
+        userService.switchRole(userId);
+
+        // Then
+        assertEquals(expectedUserRole, user.getRole());
+    }
+
+    private static Stream<Arguments> userRolesArguments() {
+
+        return Stream.of(
+                Arguments.of(UserRole.USER, UserRole.ADMIN),
+                Arguments.of(UserRole.ADMIN, UserRole.USER)
+        );
     }
 }
